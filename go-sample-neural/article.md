@@ -1,5 +1,9 @@
 # Developing a Neural Network in Golang from Scratch: From Basics to XOR Solution
 
+---
+
+> "To know is to build". (c) -Anonymous
+
 In the world of machine learning, neural networks are powerful tools for solving a wide range of tasks, from image recognition to natural language processing and games. While there are many high-level libraries that simplify the creation and training of neural networks (e.g., TensorFlow, PyTorch, Keras), understanding how these networks work "under the hood" is invaluable.
 
 This article is dedicated to creating a simple yet functional feedforward neural network in Go, using only the standard library. This approach will allow us to delve deeply into the mechanisms of forward and backward propagation, weight initialization, and training.
@@ -116,7 +120,7 @@ func ReLUDerivative(x float64) float64 {
 
  For the output layer, a linear activation (denoted as "none" in our code) is typically used to obtain raw numerical values, such as Q-values in DQN or regression outputs.
 
- ### Implementation Details: Forward and Backward Pass
+### Implementation Details: Forward and Backward Pass
 Let's examine the key `Forward` and `Backward` methods from `NeuralNetworkLayer`, which form the core of neural network computations.
 
 #### `Forward` Method (Forward Pass)
@@ -125,17 +129,17 @@ The `Forward` method is responsible for computing the output of a layer based on
 ```Go
 // Forward performs a forward pass through the layer (linear part + activation).
 func (item *NeuralNetworkLayer) Forward(input []float64) []float64 {
-	item.Input = input // Save input for use in Backward
+	item.InputVector = input // Save input for use in Backward
 	// 1. Linear transformation: multiply by weights and add biases
 	item.WeightedSums = MultiplyMatrixVector(item.Weights, input)
 	item.WeightedSums = AddVectors(item.WeightedSums, item.Biases)
 
 	// 2. Activation: apply the activation function to the result of the linear transformation
-	item.Output = make([]float64, len(item.WeightedSums))
+	item.OutputVector = make([]float64, len(item.WeightedSums))
 	for i := range item.WeightedSums {
-		item.Output[i] = item.ActivationFunc(item.WeightedSums[i])
+		item.OutputVector[i] = item.ActivationFunc(item.WeightedSums[i])
 	}
-	return item.Output
+	return item.OutputVector
 }
 ```
 
@@ -160,14 +164,14 @@ func (item *NeuralNetworkLayer) Backward(outputGradient []float64) []float64 {
 		activationGradient[i] = item.DerivativeFunc(item.WeightedSums[i])
 	}
 	// Combine the gradient from the next layer with the activation gradient (element-wise multiplication)
-	gradientAfterActivation := ElementWiseMultiply(outputGradient, activationGradient)
+	gradientAfterActivation := MultiplyVectors(outputGradient, activationGradient)
 
 	// 2. Gradient for biases: equals the gradient after activation
 	item.BiasGradients = gradientAfterActivation
 
 	// 3. Gradient for weights: computed as the outer product
 	// (gradient_after_activation X InputVector)
-	item.WeightGradients = OuterProduct(gradientAfterActivation, item.Input)
+	item.WeightGradients = OuterProduct(gradientAfterActivation, item.InputVector)
 
 	// 4. Gradient for input: computed as the product of the transposed weight matrix
 	// and the gradient after activation. This is the gradient passed to the previous layer.
@@ -387,3 +391,6 @@ Weights 1 -  [[-3.3658966295356247 3.0679477637291073]]
 We've explored how to build a basic feedforward neural network in Golang from scratch, including its architecture, activation functions, and weight initialization principles. By applying this network to solve the classic XOR problem, we've confirmed the functionality of our implementation.
 
 In the next part of this article series, we will use this architecture as a foundation for creating a more complex system – a Deep Q-Network (DQN) based agent that can learn to play Tic-Tac-Toe independently, tackling the challenge of delayed rewards. Stay tuned for updates!
+
+The full source code is available at the link:
+[https://github.com/andrey-matveyev/go-sample-neural](https://github.com/andrey-matveyev/go-sample-neural)
