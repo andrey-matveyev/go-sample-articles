@@ -116,57 +116,7 @@ func ReLUDerivative(x float64) float64 {
 
  For the output layer, a linear activation (denoted as "none" in our code) is typically used to obtain raw numerical values, such as Q-values in DQN or regression outputs.
 
-### Overall Network Structure: `NeuralNetwork`
-The neural network itself (`NeuralNetwork`) is a collection of these layers:
-
-```Go
-// network.go
-type NeuralNetwork struct {
-	Layers []*NeuralNetworkLayer
-}
-...
-// Predict performs a forward pass to obtain network predictions.
-func (item *NeuralNetwork) Predict(input []float64) []float64 {
-	output := input
-	for _, layer := range item.Layers {
-		output = layer.Forward(output)
-	}
-	return output
-}
-
-// Train performs one step of training the network.
-// input: input data
-// targetOutput: target output data (Q-values ​​for training)
-// learningRate: learning rate
-func (item *NeuralNetwork) Train(input []float64, targetOutput []float64, learningRate float64) {
-	// Forward pass (saving intermediate values)
-	predictedOutput := item.Predict(input)
-
-	// Calculate the gradient of the output (MSE loss derivative)
-	// dLoss/dOutput = 2 * (predicted - target)
-	outputGradient := make([]float64, len(predictedOutput))
-	for i := range predictedOutput {
-		outputGradient[i] = 2 * (predictedOutput[i] - targetOutput[i])
-	}
-
-	// Backward pass
-	currentGradient := outputGradient
-	for i := len(item.Layers) - 1; i >= 0; i-- {
-		currentGradient = item.Layers[i].Backward(currentGradient)
-	}
-
-	// Updating weights
-	for _, layer := range item.Layers {
-		layer.Update(learningRate)
-	}
-}
-```
-
-- `Predict`: The method for the forward pass. It simply passes the input data sequentially through each layer to get the final output.
-
-- `Train`: The method for training. It performs a forward pass, calculates the loss function gradient (MSE), then performs backpropagation by iterating through the layers in reverse order and computing gradients for each layer. Finally, it updates the weights and biases of the layers.
-
-### Implementation Details: Forward and Backward Pass
+ ### Implementation Details: Forward and Backward Pass
 Let's examine the key `Forward` and `Backward` methods from `NeuralNetworkLayer`, which form the core of neural network computations.
 
 #### `Forward` Method (Forward Pass)
@@ -237,6 +187,56 @@ The main steps of `Backward` for `NeuralNetworkLayer`:
 - The gradients for `Weights` are computed as the outer product of `gradientAfterActivation` and the layer's `Input`.
 
 - The gradient to be passed to the previous layer (`InputGradient`) is calculated as the product of the transposed weight matrix of the layer and `gradientAfterActivation`.
+
+### Overall Network Structure: `NeuralNetwork`
+The neural network itself (`NeuralNetwork`) is a collection of these layers:
+
+```Go
+// network.go
+type NeuralNetwork struct {
+	Layers []*NeuralNetworkLayer
+}
+...
+// Predict performs a forward pass to obtain network predictions.
+func (item *NeuralNetwork) Predict(input []float64) []float64 {
+	output := input
+	for _, layer := range item.Layers {
+		output = layer.Forward(output)
+	}
+	return output
+}
+
+// Train performs one step of training the network.
+// input: input data
+// targetOutput: target output data (Q-values ​​for training)
+// learningRate: learning rate
+func (item *NeuralNetwork) Train(input []float64, targetOutput []float64, learningRate float64) {
+	// Forward pass (saving intermediate values)
+	predictedOutput := item.Predict(input)
+
+	// Calculate the gradient of the output (MSE loss derivative)
+	// dLoss/dOutput = 2 * (predicted - target)
+	outputGradient := make([]float64, len(predictedOutput))
+	for i := range predictedOutput {
+		outputGradient[i] = 2 * (predictedOutput[i] - targetOutput[i])
+	}
+
+	// Backward pass
+	currentGradient := outputGradient
+	for i := len(item.Layers) - 1; i >= 0; i-- {
+		currentGradient = item.Layers[i].Backward(currentGradient)
+	}
+
+	// Updating weights
+	for _, layer := range item.Layers {
+		layer.Update(learningRate)
+	}
+}
+```
+
+- `Predict`: The method for the forward pass. It simply passes the input data sequentially through each layer to get the final output.
+
+- `Train`: The method for training. It performs a forward pass, calculates the loss function gradient (MSE), then performs backpropagation by iterating through the layers in reverse order and computing gradients for each layer. Finally, it updates the weights and biases of the layers.
 
 ## Application: Solving the XOR Problem
 
@@ -339,7 +339,48 @@ unc main() {
 
 During training, you will see the average loss gradually decrease. Note that when using sigmoid and the specified training parameters, the results might not be perfectly 0.0 or 1.0, but they will be close enough for logical classification:
 
+```
+Testing the non-trained network:
+Input: [0 0], Expected: [0], Predicted: [-0.6342]
+Input: [0 1], Expected: [1], Predicted: [-0.6208]
+Input: [1 0], Expected: [1], Predicted: [-0.0719]
+Input: [1 1], Expected: [0], Predicted: [-0.0617]
+Starting XOR training...
+Epoch 1000, Average Loss: 0.210077
+Epoch 2000, Average Loss: 0.153441
+Epoch 3000, Average Loss: 0.056236
+Epoch 4000, Average Loss: 0.003917
+Epoch 5000, Average Loss: 0.000094
+Epoch 6000, Average Loss: 0.000002
+Epoch 7000, Average Loss: 0.000000
+...
+Epoch 19000, Average Loss: 0.000000
+Epoch 20000, Average Loss: 0.000000
+XOR training finished.
+Testing the trained network:
+Input: [0 0], Expected: [0], Predicted: [0.0000]
+Input: [0 1], Expected: [1], Predicted: [1.0000]
+Input: [1 0], Expected: [1], Predicted: [1.0000]
+Input: [1 1], Expected: [0], Predicted: [0.0000]
+```
+
 As the example shows, the predicted values are very close to the expected 0 or 1, indicating successful training.
+
+If you are interested in the weights and biases before and after training, here they are:
+
+```
+// Before training
+Biases 0 -  [0 0]
+Weights 0 -  [[-1.5470222607067037 -0.01696838240061016] [0.24909017310045511 0.06488626663290908]]
+Biases 1 -  [0]
+Weights 1 -  [[-1.6581899752969296 0.389885131323495]]
+
+// Biases and Weights after training:
+Biases 0 -  [0.3944580734523731 2.1331071307836806]
+Weights 0 -  [[-3.3592486686297476 -3.275219318130251] [-1.6500618206834206 -1.631091932264212]]
+Biases 1 -  [-0.7323529446320001]
+Weights 1 -  [[-3.3658966295356247 3.0679477637291073]]
+```
 
 ## Conclusion
 
