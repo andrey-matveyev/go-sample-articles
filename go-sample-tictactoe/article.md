@@ -335,6 +335,12 @@ In this scenario, the agent (Player X) always makes the first move in the game. 
 
 **Training Parameters**:
 
+These are the settings that can be changed when conducting an experiment.
+'Knobs' that can be 'turned' for fine-tuning.
+The network implemented here usually forgives even gross errors.
+The most you risk is falling into a local minimum instead of a global one.
+Feel free to try it yourself.
+
 ```Go
 // main.go
 const (
@@ -363,7 +369,36 @@ const (
 
 **Results:**
 
-When the agent was to make the first move to the center, it demonstrated outstanding results, achieving up to 992 wins out of 1000 test games against a random opponent, with a minimal number of losses and draws. This confirms that the agent successfully learned an optimal strategy for the first player.
+```
+PS D:\go\go-sample-tictactoe> go run .
+Starting DQN agent training (X) against a random opponent (O) for Tic-Tac-Toe...
+Episode: 1000, Wins X: 571 (571), Losses X: 307, Draws: 122, Epsilon X: 0.9876, Q(start): 0.4501|0.5164|0.4117  0.5863[0.5449]0.4485  0.3473|0.4411|0.4166
+Episode: 2000, Wins X: 590 (590), Losses X: 284, Draws: 126, Epsilon X: 0.9715, Q(start): 0.3683|0.4917|0.3963  0.2354[0.6179]0.3571  0.2806|0.3732|0.3737
+Episode: 3000, Wins X: 585 (590), Losses X: 294, Draws: 121, Epsilon X: 0.9558, Q(start): 0.2797|0.4310|0.3559  0.1067[0.4802]0.2719  0.1742|0.2720|0.2669
+Episode: 4000, Wins X: 588 (590), Losses X: 285, Draws: 127, Epsilon X: 0.9402, Q(start): 0.2361|0.4065|0.3263  0.1037[0.3945]0.2356  0.1445|0.2771|0.2186
+...
+Episode: 297000, Wins X: 952 (969), Losses X: 43, Draws: 5, Epsilon X: 0.0156, Q(start): 0.5193|0.3906|0.2095  0.5050[0.3286]0.4332  0.1040|0.3630|0.2807
+Episode: 298000, Wins X: 957 (969), Losses X: 40, Draws: 3, Epsilon X: 0.0154, Q(start): 0.5189|0.3942|0.1822  0.4883[0.3528]0.4347  0.1214|0.3698|0.2528
+Episode: 299000, Wins X: 977 (977), Losses X: 20, Draws: 3, Epsilon X: 0.0152, Q(start): 0.5201|0.4159|0.1651  0.4708[0.3775]0.4352  0.1291|0.3870|0.2078
+--- Target network updated at step 1050000 (Epsilon: 0.0151) ---
+Episode: 300000, Wins X: 968 (977), Losses X: 23, Draws: 9, Epsilon X: 0.0150, Q(start): 0.4733|0.4222|0.1718  0.4519[0.4072]0.4743  0.1526|0.4102|0.1889
+...
+Episode: 497000, Wins X: 952 (990), Losses X: 43, Draws: 5, Epsilon X: 0.0011, Q(start): 0.3910|-0.3152|-0.2335  -0.2994[0.4932]0.0485  0.0135|-0.4090|-0.2174
+--- Target network updated at step 1700000 (Epsilon: 0.0011) ---
+Episode: 498000, Wins X: 942 (990), Losses X: 55, Draws: 3, Epsilon X: 0.0011, Q(start): 0.3798|-0.3127|-0.2245  -0.3118[0.4557]0.0439  0.0072|-0.4120|-0.2115
+Episode: 499000, Wins X: 936 (990), Losses X: 56, Draws: 8, Epsilon X: 0.0011, Q(start): 0.3651|-0.3107|-0.2292  -0.3250[0.3711]0.0254  -0.0033|-0.4216|-0.1881
+Episode: 500000, Wins X: 954 (990), Losses X: 41, Draws: 5, Epsilon X: 0.0011, Q(start): 0.3561|-0.3119|-0.2014  -0.3267[0.3711]0.0196  -0.0191|-0.4155|-0.1827
+
+Training complete.
+Testing the agent (X against random O)...
+
+Test Results (1000 games, Agent X vs random O):
+Agent X Wins: 956
+Agent X Losses (Random O Wins): 39
+Draws: 5
+```
+
+When the agent was to make the first move to the center, it demonstrated outstanding results, achieving up to 992 wins out of 1000 (in some cases) test games against a random opponent, with a minimal number of losses and draws. This confirms that the agent successfully learned an optimal strategy for the first player.
 
 "Win Growth (agent moves first)" graph:
 
@@ -391,22 +426,105 @@ const (
 **Results:**
 
 ```
+PS D:\go\go-sample-tictactoe> go run .
+Starting DQN agent training (X) against a random opponent (O) for Tic-Tac-Toe...
+Episode: 1000, Wins X: 296 (296), Losses X: 587, Draws: 117, Epsilon X: 0.9902, Q(start): 0.2536|0.3091|0.2323  0.3227[0.3963]0.3577  0.4702|0.4281|0.2465
+Episode: 2000, Wins X: 298 (298), Losses X: 590, Draws: 112, Epsilon X: 0.9766, Q(start): 0.1909|0.3386|0.2124  0.3879[0.3856]0.3629  0.5409|0.4653|0.2537
+Episode: 3000, Wins X: 295 (298), Losses X: 598, Draws: 107, Epsilon X: 0.9633, Q(start): 0.0990|0.3089|0.1477  0.3343[0.3218]0.2929  0.5055|0.4229|0.2093
+Episode: 4000, Wins X: 261 (298), Losses X: 601, Draws: 138, Epsilon X: 0.9501, Q(start): 0.0718|0.2712|0.0945  0.3015[0.2998]0.2637  0.4218|0.3067|0.1649
+...
+Episode: 69000, Wins X: 610 (610), Losses X: 342, Draws: 48, Epsilon X: 0.3986, Q(start): 0.5987|0.5451|0.5798  0.5912[0.6872]0.5793  0.6331|0.5710|0.5508
+Episode: 70000, Wins X: 610 (610), Losses X: 359, Draws: 31, Epsilon X: 0.3935, Q(start): 0.5962|0.5428|0.5695  0.5917[0.6848]0.5758  0.6282|0.5837|0.5531
+Episode: 71000, Wins X: 606 (610), Losses X: 365, Draws: 29, Epsilon X: 0.3885, Q(start): 0.5914|0.5330|0.5650  0.5899[0.6844]0.5742  0.6268|0.5863|0.5423
+Episode: 72000, Wins X: 570 (610), Losses X: 407, Draws: 23, Epsilon X: 0.3835, Q(start): 0.5867|0.5349|0.5650  0.5872[0.6871]0.5795  0.6202|0.5833|0.5385
+Episode: 73000, Wins X: 564 (610), Losses X: 405, Draws: 31, Epsilon X: 0.3786, Q(start): 0.5912|0.5303|0.5606  0.5833[0.6815]0.5811  0.6198|0.5832|0.5418
+Episode: 74000, Wins X: 612 (612), Losses X: 353, Draws: 35, Epsilon X: 0.3737, Q(start): 0.5958|0.5287|0.5575  0.5840[0.6816]0.5730  0.6146|0.5765|0.5359
+--- Target network updated at step 250000 (Epsilon: 0.3694) ---
+Episode: 75000, Wins X: 588 (612), Losses X: 373, Draws: 39, Epsilon X: 0.3689, Q(start): 0.6005|0.5305|0.5658  0.5903[0.6910]0.5730  0.6132|0.5845|0.5456
+Episode: 76000, Wins X: 650 (650), Losses X: 311, Draws: 39, Epsilon X: 0.3642, Q(start): 0.6314|0.5703|0.5932  0.6218[0.7187]0.6036  0.6409|0.6085|0.5756
+...
+Episode: 497000, Wins X: 792 (822), Losses X: 185, Draws: 23, Epsilon X: 0.0020, Q(start): 0.5345|0.3504|0.2066  0.2787[0.5258]0.4991  0.1034|0.5461|0.5410
+Episode: 498000, Wins X: 804 (822), Losses X: 168, Draws: 28, Epsilon X: 0.0020, Q(start): 0.5329|0.3472|0.2169  0.2769[0.5331]0.4969  0.1012|0.5451|0.5428
+Episode: 499000, Wins X: 782 (822), Losses X: 180, Draws: 38, Epsilon X: 0.0019, Q(start): 0.5315|0.3456|0.2200  0.2724[0.5288]0.4962  0.1074|0.5430|0.5417
+Episode: 500000, Wins X: 780 (822), Losses X: 188, Draws: 32, Epsilon X: 0.0019, Q(start): 0.5310|0.3443|0.2219  0.2718[0.5285]0.4971  0.1044|0.5442|0.5446
+
+Training complete.
+Testing the agent (X against random O)...
+
+Test Results (1000 games, Agent X vs random O):
+Agent X Wins: 783
+Agent X Losses (Random O Wins): 191
+Draws: 26
 ```
 
 In the initial stages of training, the agent, as expected, showed a lower win percentage and a higher number of losses/draws due to the opponent's first-move advantage. However, as training progressed, the agent significantly improved its performance.
 
-**Example results after training:**
+**Example game after training:**
 
-These results show that the agent successfully learned to optimally respond to various first moves by the opponent, significantly increasing its win rate despite the strategic disadvantage of moving second. The "first move selection" problem for the agent disappeared, as it focused on reactive tactics.
+```
+Example game after training (X vs random O):
+-------------
+|   |   |   |
+-------------
+|   |   |   |
+-------------
+| O |   |   |
+-------------
+X's Turn:
+-------------
+|   |   |   |
+-------------
+|   |   | X |
+-------------
+| O |   |   |
+-------------
+O's Turn:
+-------------
+|   |   |   |
+-------------
+| O |   | X |
+-------------
+| O |   |   |
+-------------
+X's Turn:
+-------------
+|   |   |   |
+-------------
+| O |   | X |
+-------------
+| O |   | X |
+-------------
+O's Turn:
+-------------
+|   |   |   |
+-------------
+| O |   | X |
+-------------
+| O | O | X |
+-------------
+X's Turn:
+-------------
+|   |   | X |
+-------------
+| O |   | X |
+-------------
+| O | O | X |
+-------------
+Game Over! Player X won!
+```
 
 "Win Growth (agent moves second)" graph:
 
 ![Win Growth (agent moves second)](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/cth1rd7mu9nfgjfid8kb.png)
 
+These results show that the agent successfully learned to optimally respond to various first moves by the opponent, significantly increasing its win rate despite the strategic disadvantage of moving second. The "first move selection" problem for the agent disappeared, as it focused on reactive tactics.
+
 ### Conclusion
 
 The project on training a DQN agent for Tic-Tac-Toe successfully demonstrated the effectiveness of deep reinforcement learning algorithms even for simple deterministic games. We saw how the agent can adapt to different roles (first/second player) and achieve near-optimal performance against a random opponent.
 
+The full source code is available at the link:
+[https://github.com/andrey-matveyev/go-sample-tictactoe](https://github.com/andrey-matveyev/go-sample-tictactoe)
 
 #### Postscript
 
