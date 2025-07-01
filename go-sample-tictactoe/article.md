@@ -277,6 +277,16 @@ func (item *DQNAgent) Train(batchSize, step int) {
 }
 ```
 
+Note the Bellman equation:
+
+```Go
+  ...
+  targetQ = exp.Reward + item.Gamma*qValueFromTargetNetwork
+  ...
+```
+
+Using this mechanism, the "reward" gradually "propagates" from the end of the game to its beginning.
+
 **Rewards**
 
 The `GetReward` function defines the reward structure for the agent:
