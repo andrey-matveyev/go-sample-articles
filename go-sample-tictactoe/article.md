@@ -314,6 +314,21 @@ func (item *Board) GetReward(agentPlayer int) float64 {
 
 ### Training Process and Results
 
+So, we are all set for testing.
+Let's briefly summarize what we have:
+- A **neural network** with a 9:27:9 architecture that knows nothing.
+- A **game board** and implementation of game logic (start, rule adherence, and end detector (win/loss/draw)).
+- An **opponent** who can make moves into free cells randomly. And that's all.
+- An **agent** that, from the start, plays like its opponent but has the ability to learn. It knows when the game ends. And it knows whether it finished the game well or poorly.
+
+What can we observe and by what criteria can we determine the learning progress?
+- Firstly, it's the agent's win percentage (expected to increase).
+- Secondly, we can observe the decrease in Epsilon to understand what is happening – whether the agent is exploring (making random moves) or utilizing its accumulated experience.
+- Thirdly, we can look at the weight vector on the output layer to understand how the agent decides to make its first move on an empty board (it is expected that the center will have the largest weight, then the corners, and then the sides as the least promising).
+- And finally, we can track the maximum number of wins achieved throughout the entire experiment.
+
+Let's see what came of this and whether our agent will show growth in its competence.
+
 **Training the Agent as the First Player**
 
 In this scenario, the agent (Player X) always makes the first move in the game. To accelerate convergence and ensure the learning of an optimal starting strategy, we can experimented with forcing the first move to the center of the board (default without this).
@@ -350,6 +365,10 @@ const (
 
 When the agent was to make the first move to the center, it demonstrated outstanding results, achieving up to 992 wins out of 1000 test games against a random opponent, with a minimal number of losses and draws. This confirms that the agent successfully learned an optimal strategy for the first player.
 
+"Win Growth (agent moves first)" graph:
+
+![Win Growth (agent moves first)" graph](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/83dbqlau2bi6czx9picr.png)
+
 **Training the Agent as the Second Player**
 
 In this scenario, the opponent (Player O) always makes the first move randomly, and our agent (Player X) always responds second. This puts the agent in a less advantageous position, as the first move in Tic-Tac-Toe provides a strategic advantage. The goal of this experiment is to test how well the agent can adapt to the role of the second player and minimize the opponent's advantage.
@@ -371,13 +390,18 @@ const (
 
 **Results:**
 
+```
+```
+
 In the initial stages of training, the agent, as expected, showed a lower win percentage and a higher number of losses/draws due to the opponent's first-move advantage. However, as training progressed, the agent significantly improved its performance.
 
 **Example results after training:**
 
 These results show that the agent successfully learned to optimally respond to various first moves by the opponent, significantly increasing its win rate despite the strategic disadvantage of moving second. The "first move selection" problem for the agent disappeared, as it focused on reactive tactics.
 
-**Agent competence growth chart:**
+"Win Growth (agent moves second)" graph:
+
+![Win Growth (agent moves second)](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/cth1rd7mu9nfgjfid8kb.png)
 
 ### Conclusion
 
